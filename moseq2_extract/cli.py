@@ -18,6 +18,7 @@ from moseq2_extract.helpers.wrappers import (
     flip_file_wrapper,
     generate_index_wrapper,
     aggregate_extract_results_wrapper,
+    generate_index_from_agg_res_wrapper,
     convert_raw_to_avi_wrapper,
     copy_slice_wrapper,
 )
@@ -700,6 +701,22 @@ def generate_index(input_dir, output_file):
 def aggregate_extract_results(input_dir, format, output_dir, mouse_threshold):
 
     aggregate_extract_results_wrapper(input_dir, format, output_dir, mouse_threshold)
+
+
+@cli.command(
+    name="agg-to-index",
+    help="Generate an index file from aggregated results with default as group names",
+)
+@click.option(
+    "--input-dir",
+    "-i",
+    type=click.Path(),
+    default=os.path.join(os.getcwd(), "aggregate_results"),
+    help="Directory for aggregated results folder",
+)
+def agg_to_index(input_dir):
+
+    generate_index_from_agg_res_wrapper(input_dir)
 
 
 @cli.command(
