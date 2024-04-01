@@ -1,12 +1,14 @@
 """
 Image reading/writing functionality.
 """
+
 import os
 import ast
 import json
 import numpy as np
 from skimage.external import tifffile
 from os.path import join, dirname, exists
+
 
 def read_tiff_files(input_dir):
     """
@@ -33,7 +35,10 @@ def read_tiff_files(input_dir):
 
     return images, filenames
 
-def write_image(filename, image, scale=True, scale_factor=None, frame_dtype='uint16', compress=0):
+
+def write_image(
+    filename, image, scale=True, scale_factor=None, frame_dtype="uint16", compress=0
+):
     """
     Save image data.
 
@@ -56,23 +61,27 @@ def write_image(filename, image, scale=True, scale_factor=None, frame_dtype='uin
 
         if not scale_factor:
             # scale image to `dtype`'s full range
-            scale_factor = int(max_int / (np.nanmax(image) + 1e-25)) # adding very small value to avoid divide by 0
+            scale_factor = int(
+                max_int / (np.nanmax(image) + 1e-25)
+            )  # adding very small value to avoid divide by 0
             image = image * scale_factor
         elif isinstance(scale_factor, tuple):
             image = np.float32(image)
             image = (image - scale_factor[0]) / (scale_factor[1] - scale_factor[0])
             image = np.clip(image, 0, 1) * max_int
 
-        metadata = {'scale_factor': str(scale_factor)}
+        metadata = {"scale_factor": str(scale_factor)}
 
     directory = dirname(file)
     if not exists(directory):
         os.makedirs(directory)
 
-    tifffile.imsave(file, image.astype(frame_dtype), compress=compress, metadata=metadata)
+    tifffile.imsave(
+        file, image.astype(frame_dtype), compress=compress, metadata=metadata
+    )
 
 
-def read_image(filename, scale=True, scale_key='scale_factor'):
+def read_image(filename, scale=True, scale_key="scale_factor"):
     """
     Load image data
 
@@ -91,8 +100,7 @@ def read_image(filename, scale=True, scale_key='scale_factor'):
     image = tmp.asarray()
 
     if scale:
-        image_desc = json.loads(
-            tmp.pages[0].tags['image_description'].as_str()[2:-1])
+        image_desc = json.loads(tmp.pages[0].tags["image_description"].as_str()[2:-1])
 
         try:
             scale_factor = int(image_desc[scale_key])
@@ -103,7 +111,7 @@ def read_image(filename, scale=True, scale_key='scale_factor'):
             image = image / scale_factor
         elif type(scale_factor) is tuple:
             iinfo = np.iinfo(image.dtype)
-            image = image.astype('float32')/iinfo.max
+            image = image.astype("float32") / iinfo.max
             image = image * (scale_factor[1] - scale_factor[0]) + scale_factor[0]
 
     return image
