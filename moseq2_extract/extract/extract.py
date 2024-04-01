@@ -109,8 +109,9 @@ def extract_chunk(
 
     if bground is not None:
         # Perform background subtraction
-        if not kwargs.get("graduate_walls", False):
-            chunk = (bground - chunk).astype(frame_dtype)
+        if not kwargs.get('graduate_walls', False):
+            # pixels with a value of 0 are depth values that could not be computed
+            chunk = ((bground - chunk) * (chunk != 0)).astype(frame_dtype)
         else:
             # Subtracting only background area where mouse is not on the bucket edge
             mouse_on_edge = (bground < true_depth) & (chunk < bground)
