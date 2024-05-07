@@ -634,6 +634,7 @@ def generate_config(output_file, camera_type):
         params["spatial_filter_size"] = [5]
         params["tail_filter_size"] = [15, 15]
         params["crop_size"] = [120, 120]
+        params["camera_type"] = "azure"
 
     with open(output_file, "w") as f:
         yaml.safe_dump(params, f)
